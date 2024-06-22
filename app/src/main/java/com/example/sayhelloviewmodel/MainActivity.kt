@@ -3,36 +3,30 @@ package com.example.sayhelloviewmodel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.sayhelloviewmodel.ui.theme.SayHelloViewModelTheme
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sayhelloviewmodel.screens.Home
 import com.example.sayhelloviewmodel.screens.Welcome
+import com.example.sayhelloviewmodel.ui.theme.SayHelloViewModelTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SayHelloViewModelTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    //color = MaterialTheme.colorScheme.background
+                    color = Color.Yellow
                 ) {
-                    //Greeting("Android")
-                    //ScreenSetup()
                     MainScreen()
                 }
             }
@@ -44,30 +38,21 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     // Inspiration from https://medium.com/@khambhaytajaydip/creating-sharedviewmodel-in-android-98ed4aceb7dd
-    val viewModel: DemoViewModel = viewModel()
+    val viewModel: UserViewModel = viewModel() // persistence
 
     NavHost(navController = navController, startDestination = NavRoutes.Home.route) {
         composable(NavRoutes.Home.route) {
-            Home(navController = navController, viewModel = viewModel)
+            Home(
+                name = viewModel.name,
+                onNameChange = { viewModel.name = it },
+                onNavigate = { navController.navigate(NavRoutes.Welcome.route) }
+            )
         }
         composable(NavRoutes.Welcome.route) {
-            Welcome(navController, viewModel = viewModel)
+            Welcome(
+                name = viewModel.name,
+                onNavigate = { navController.popBackStack() }
+            )
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SayHelloViewModelTheme {
-        Greeting("Android")
     }
 }

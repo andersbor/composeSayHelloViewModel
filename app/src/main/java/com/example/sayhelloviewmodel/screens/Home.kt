@@ -7,35 +7,54 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import com.example.sayhelloviewmodel.DemoViewModel
-import com.example.sayhelloviewmodel.NavRoutes
 
 @Composable
-fun Home(navController: NavHostController, viewModel: DemoViewModel = viewModel()) {
-    val onNameChange = { text: String -> viewModel.name = text }
-
+fun Home(
+    name: String = "",
+    onNameChange: (String) -> Unit = { },
+    onNavigate: () -> Unit = { },
+) {
     Column(modifier = Modifier.padding(10.dp)) {
+        var isError by remember { mutableStateOf(false) }
 
         OutlinedTextField(
-            value = viewModel.name  ,
+            value = name,
             onValueChange = onNameChange,
+            isError = isError,
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Enter your name") }
         )
 
-        Text ("Hello ${viewModel.name}")
+        if (isError) {
+            Text("Please enter your name", color = Color.Red)
+        } else {
+            Text("Hello $name")
+        }
 
         Button(modifier = Modifier.fillMaxWidth(),
             onClick = {
-                viewModel.name = viewModel.name.trim()
-                if (viewModel.name.isNotEmpty())
-                    navController.navigate(NavRoutes.Welcome.route)
+                //viewModel.name = viewModel.name.trim()
+                if (name.isNotEmpty()) {
+                    isError = false
+                    //navController.navigate(NavRoutes.Welcome.route)
+                    onNavigate()
+                } else isError = true
             }) {
             Text("Say Hello")
         }
     }
+}
+
+@Preview
+@Composable
+fun HomePreview() {
+    Home(name = "Anders")
 }
